@@ -1,0 +1,20 @@
+# Ignore the Visual Studio folder
+.vs/
+
+# Ignore build artifacts in obj and bin folders
+obj/
+bin/
+
+# Ignore user-specific files
+*.user
+*.suo
+
+# Ignore log files
+*.log
+
+# Ignore package managers' folders (e.g., Node.js or NuGet)
+node_modules/
+packages/
+
+.vs/
+obj/
