@@ -4,6 +4,7 @@ using EventManagement;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventManagement.Migrations
 {
     [DbContext(typeof(EventDbContext))]
-    partial class EventDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240908094311_eventValidation")]
+    partial class eventValidation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,26 +24,6 @@ namespace EventManagement.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("EventAttendees", b =>
-                {
-                    b.Property<int>("AttendeeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("JoinedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.HasKey("AttendeeId", "EventId");
-
-                    b.HasIndex("EventId");
-
-                    b.ToTable("EventAttendees", (string)null);
-                });
 
             modelBuilder.Entity("EventManagement.Models.Attendee", b =>
                 {
@@ -50,11 +33,16 @@ namespace EventManagement.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AttendeeId"));
 
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("AttendeeId");
+
+                    b.HasIndex("EventId");
 
                     b.ToTable("Attendees");
                 });
@@ -87,23 +75,13 @@ namespace EventManagement.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("date");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("EventId");
 
@@ -112,33 +90,15 @@ namespace EventManagement.Migrations
                     b.ToTable("Events");
                 });
 
-            modelBuilder.Entity("EventManagement.Models.EventDetail", b =>
+            modelBuilder.Entity("EventManagement.Models.Attendee", b =>
                 {
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("EventId");
-
-                    b.ToTable("EventDetail");
-                });
-
-            modelBuilder.Entity("EventAttendees", b =>
-                {
-                    b.HasOne("EventManagement.Models.Attendee", null)
-                        .WithMany()
-                        .HasForeignKey("AttendeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EventManagement.Models.Event", null)
-                        .WithMany()
+                    b.HasOne("EventManagement.Models.Event", "Event")
+                        .WithMany("Attendees")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Event");
                 });
 
             modelBuilder.Entity("EventManagement.Models.Event", b =>
@@ -152,17 +112,6 @@ namespace EventManagement.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("EventManagement.Models.EventDetail", b =>
-                {
-                    b.HasOne("EventManagement.Models.Event", "Event")
-                        .WithOne("EventDetail")
-                        .HasForeignKey("EventManagement.Models.EventDetail", "EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Event");
-                });
-
             modelBuilder.Entity("EventManagement.Models.Category", b =>
                 {
                     b.Navigation("Events");
@@ -170,8 +119,7 @@ namespace EventManagement.Migrations
 
             modelBuilder.Entity("EventManagement.Models.Event", b =>
                 {
-                    b.Navigation("EventDetail")
-                        .IsRequired();
+                    b.Navigation("Attendees");
                 });
 #pragma warning restore 612, 618
         }

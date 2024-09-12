@@ -4,6 +4,7 @@ using EventManagement;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventManagement.Migrations
 {
     [DbContext(typeof(EventDbContext))]
-    partial class EventDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240908100308_ConfigureEntitiesAndRelationships")]
+    partial class ConfigureEntitiesAndRelationships
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,22 +25,17 @@ namespace EventManagement.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("EventAttendees", b =>
+            modelBuilder.Entity("AttendeeEvent", b =>
                 {
-                    b.Property<int>("AttendeeId")
+                    b.Property<int>("AttendeesAttendeeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("EventId")
+                    b.Property<int>("EventsEventId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("JoinedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                    b.HasKey("AttendeesAttendeeId", "EventsEventId");
 
-                    b.HasKey("AttendeeId", "EventId");
-
-                    b.HasIndex("EventId");
+                    b.HasIndex("EventsEventId");
 
                     b.ToTable("EventAttendees", (string)null);
                 });
@@ -87,15 +85,8 @@ namespace EventManagement.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("date");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -126,17 +117,17 @@ namespace EventManagement.Migrations
                     b.ToTable("EventDetail");
                 });
 
-            modelBuilder.Entity("EventAttendees", b =>
+            modelBuilder.Entity("AttendeeEvent", b =>
                 {
                     b.HasOne("EventManagement.Models.Attendee", null)
                         .WithMany()
-                        .HasForeignKey("AttendeeId")
+                        .HasForeignKey("AttendeesAttendeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("EventManagement.Models.Event", null)
                         .WithMany()
-                        .HasForeignKey("EventId")
+                        .HasForeignKey("EventsEventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
